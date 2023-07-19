@@ -2,28 +2,10 @@
 Parse custom inputs from document. 
 
 """
-
-from dataclasses import dataclass
+from typing import Union, Optional
+from backend.custom_dataclasses import Definition, OrderedProperty, UnorderedProperty
 from pathlib import Path
 import re
-
-
-@dataclass
-class UnorderedProperty:
-    name: str
-    value: set[str]
-
-
-@dataclass
-class OrderedProperty:
-    name: str
-    value: list[str]
-
-
-@dataclass
-class Definition:
-    value1: str
-    value2: str
 
 
 def check_string_starts_numeric(my_string: str) -> bool:
@@ -48,23 +30,22 @@ def split_first_occurance(my_string, pattern) -> list[str]:
     return result
 
 
-def read_markdown_file(filename: str):
+def read_markdown_file(filename: Path) -> list[str]:
     with open(filename, "r") as f:
         return [x for x in f.read().split("\n\n") if x != ""]
 
 
 def parse_markdown_file(
     filename: Path,
-) -> list[UnorderedProperty, OrderedProperty, Definition]:
-    file: str = read_markdown_file(filename)
-    """Parse markdown file into a list of objects. 
-    
+) -> list[Optional[Union[Definition, OrderedProperty, UnorderedProperty]]]:
+    """Parse markdown file into a list of objects.
     Args:
         filename : path to markdown file.
     Returns:
         list of objects.
     """
-    results = []
+    file: list[str] = read_markdown_file(filename)
+    results: list[Optional[Union[Definition, OrderedProperty, UnorderedProperty]]] = []
     for i in range(len(file)):
         line = file[i]
         if "=" in line:
@@ -97,4 +78,4 @@ def parse_markdown_file(
                 results.append(
                     OrderedProperty(name=line.replace(":", ""), value=ordered_list)
                 )
-    results
+    return results

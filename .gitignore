@@ -1,2 +1,5 @@
 .ipynb_checkpoints/
 data/
+envy.sh
+.venv/
+__pycache__

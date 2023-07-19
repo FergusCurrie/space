@@ -1,0 +1,6 @@
+spacy
+numpy
+pandas 
+neo4j
+faker 
+mypy
