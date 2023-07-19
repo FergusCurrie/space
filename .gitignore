@@ -3,3 +3,4 @@ data/
 envy.sh
 .venv/
 __pycache__
+frontend/node_modules/

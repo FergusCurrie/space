@@ -17,22 +17,50 @@ class NeoConnector:
             for definition in definitions:
                 session.run(query, name=definition.value1, definition=definition.value2)
 
-    def query_all_nodes_and_edges(self):
+    def fill_ordered_properties(self, ordered_properties: list[OrderedProperty]):
         with self.driver.session() as session:
-            query = "MATCH (n)-[r]->(m) RETURN n, r, m"
+            query = "MERGE (n:Concept {name: $name})"
+            # cypher query to create two nodes and a relationship between them
+
+            query_add_relationship = "MATCH(n:Concept) WHERE n.name = $ordered_name  MERGE (n)-[:property]->(p:OrderedProperty {name: $prop_name, number: $number})"
+            for i, ordered_property in enumerate(ordered_properties):
+                session.run(query, name=ordered_property.name)
+                for prop in ordered_property.value:
+                    # create relationship
+                    session.run(
+                        query_add_relationship,
+                        prop_name=prop,
+                        ordered_name=ordered_property.name,
+                        number=i + 1,
+                    )
+
+    def fill_unordered_properties(self, unordered_properties: list[UnorderedProperty]):
+        with self.driver.session() as session:
+            query = "MERGE (n:Concept {name: $name})"
+            # cypher query to create two nodes and a relationship between them
+
+            query_add_relationship = "MATCH(n:Concept) WHERE n.name = $unordered_name  MERGE (n)-[:property]->(p:UnOrderedProperty {name: $prop_name})"
+            for unordered_property in unordered_properties:
+                session.run(query, name=unordered_property.name)
+                for i, prop in enumerate(unordered_property.value):
+                    # create relationship
+                    session.run(
+                        query_add_relationship,
+                        prop_name=prop,
+                        unordered_name=unordered_property.name,
+                    )
+
+    def query_all_nodes(self):
+        with self.driver.session() as session:
+            query = "MATCH (n) RETURN n"
             result = session.run(query)
 
             for record in result:
                 node = record["n"]
-                edge = record["r"]
-                adjacent_node = record["m"]
 
                 # Process the node, edge, and adjacent_node as desired
                 # For example, print their properties
                 print(f"Node: {node}")
-                print(f"Edge: {edge}")
-                print(f"Adjacent Node: {adjacent_node}")
-                print("")
 
     def fill_neo4j_with_random_data(self, node_count, relationship_count):
         fake = Faker()

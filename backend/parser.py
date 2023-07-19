@@ -54,15 +54,18 @@ def parse_markdown_file(
         if ":" in line:
             j = 1
             collection = True
-            unordered_list = set()
+            unordered_set = set()
             ordered_list = []
             while collection:
                 if i + j < len(file):
                     next_line = file[i + j]
                     if next_line.startswith("-"):
-                        unordered_list.add(next_line.replace("-", ""))
+                        for bullet in next_line.split("\n"):
+                            unordered_set.add(bullet.replace("-", ""))
+
                     elif check_string_starts_numeric(next_line):
-                        ordered_list.append(next_line.replace("-", ""))
+                        for bullet in next_line.split("\n"):
+                            ordered_list.append(bullet.replace("-", ""))
                     else:
                         j -= 1
                         break
@@ -70,9 +73,9 @@ def parse_markdown_file(
                 else:
                     break
             i += j
-            if unordered_list != []:
+            if len(unordered_set) > 0:
                 results.append(
-                    UnorderedProperty(name=line.replace(":", ""), value=unordered_list)
+                    UnorderedProperty(name=line.replace(":", ""), value=unordered_set)
                 )
             elif ordered_list != []:
                 results.append(
