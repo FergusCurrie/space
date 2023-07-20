@@ -1,6 +1,12 @@
-spacy
+
+faker 
+git+https://github.com/huggingface/transformers
+install
+ipykernel
+mypy
+neo4j
 numpy
 pandas 
-neo4j
-faker 
-mypy
+sentencepiece
+spacy
+torch
